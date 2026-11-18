@@ -1,26 +1,30 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Data;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Views;
 
 namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
 {
     // =============================================================================
     // ViewModel de la pantalla principal (lista de contactos).
     // No conoce SQLite ni ninguna clase de "SQLite.*": toda la persistencia
-    // pasa por ContactoRepository, que llega inyectado por constructor
+    // pasa por IContactoRepository, que llega inyectado por constructor
     // (el registro de la dependencia está en MauiProgram.cs).
-    // Los cuadros de diálogo se muestran mediante IDialogService, así el ViewModel
-    // no depende de Shell para comunicarse con el usuario.
+    // Los diálogos (IDialogService) y la navegación (INavigationService) también se
+    // reciben como abstracciones: el ViewModel no depende de Shell ni de ninguna
+    // clase de la interfaz gráfica, y por eso se puede probar con mocks.
     // =============================================================================
 
     public partial class ContactosViewModel : ObservableObject
     {
-        private readonly ContactoRepository _contactoRepository;
+        private readonly IContactoRepository _contactoRepository;
         private readonly IDialogService _dialogService;
+        private readonly INavigationService _navigationService;
         public ObservableCollection<Contacto> Contactos { get; } = new();
 
         [ObservableProperty]
@@ -29,10 +33,14 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
         [ObservableProperty]
         private bool estaCargando;
 
-        public ContactosViewModel(ContactoRepository contactoRepository, IDialogService dialogService)
+        public ContactosViewModel(
+            IContactoRepository contactoRepository,
+            IDialogService dialogService,
+            INavigationService navigationService)
         {
             _contactoRepository = contactoRepository;
             _dialogService = dialogService;
+            _navigationService = navigationService;
         }
 
         [RelayCommand]
@@ -96,16 +104,18 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
             await NavegarAlModalAsync(contacto);
         }
 
+        // Abre el modal de alta/edición enviando el contacto como parámetro.
+        // La ruta y la clave del parámetro salen de RutasNavegacion (sin "strings mágicos").
         private async Task NavegarAlModalAsync(Contacto contacto)
         {
             try
             {
                 var parametrosNavegacion = new Dictionary<string, object>
                 {
-                    { "Contacto", contacto }
+                    { RutasNavegacion.ParametroContacto, contacto }
                 };
 
-                await Shell.Current.GoToAsync(nameof(ContactoModalPage), parametrosNavegacion);
+                await _navigationService.NavegarAAsync(RutasNavegacion.ContactoModal, parametrosNavegacion);
             }
             catch (Exception ex)
             {

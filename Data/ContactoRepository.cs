@@ -1,29 +1,36 @@
-﻿using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
+﻿using System.Diagnostics;
+using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
 using SQLite;
-using System.Diagnostics;
-
 
 namespace EscobarMatias_ActividadPractica_AppMovil_ll.Data
 {
     // ==============================================================================================
     // Única clase de todo el proyecto que conoce la existencia de SQLite.
     // Ni las Views ni los ViewModels deben referenciar "SQLite.*" directamente:
-    // todo pasa por los métodos públicos de este Repository.
-    // esta clase NO mantiene ninguna lista de contactos en memoria.
+    // todo pasa por los métodos públicos de este Repository (contrato: IContactoRepository).
+    // Esta clase NO mantiene ninguna lista de contactos en memoria.
     // Cada método público consulta o modifica la base de datos en el momento en que se lo llama.
-    // Lo único que se conserva entre llamadas es la conexión física
+    // Lo único que se conserva entre llamadas es la conexión física.
+    //
+    // La ruta del archivo de base de datos se recibe por constructor (en vez de calcularla acá con
+    // FileSystem de MAUI): así la clase no depende de la plataforma y en las pruebas de integración
+    // se le puede pasar ":memory:" para trabajar con SQLite en memoria.
     // ==============================================================================================
-
-    public class ContactoRepository
+    public class ContactoRepository : IContactoRepository
     {
+        private readonly string _rutaBaseDeDatos;
         private SQLiteAsyncConnection? _conexion;
         private bool _baseDeDatosInicializada;
-        private const string NombreArchivoBaseDeDatos = "agenda_contactos.db3";
+
+        public ContactoRepository(string rutaBaseDeDatos)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(rutaBaseDeDatos);
+            _rutaBaseDeDatos = rutaBaseDeDatos;
+        }
 
         // Crea la conexión (si todavía no existe), crea la tabla "Contacto"
         // si no existe y siembra datos de ejemplo si la tabla está vacía.
-        // se ejecuta una solo una vez, la primera vez que se necesita la base de datos.
-
+        // Se ejecuta una sola vez, la primera vez que se necesita la base de datos.
         private async Task InicializarBaseDeDatosAsync()
         {
             if (_baseDeDatosInicializada)
@@ -31,8 +38,7 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.Data
 
             try
             {
-                string rutaBaseDeDatos = Path.Combine(FileSystem.AppDataDirectory, NombreArchivoBaseDeDatos);
-                _conexion = new SQLiteAsyncConnection(rutaBaseDeDatos);
+                _conexion = new SQLiteAsyncConnection(_rutaBaseDeDatos);
 
                 // CreateTableAsync no hace nada si la tabla ya existe.
                 await _conexion.CreateTableAsync<Contacto>();
@@ -51,7 +57,7 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.Data
         }
 
         // Inserta 3 contactos de ejemplo SOLO la primera vez que se usa la app.
-        // Esto evitará duplicar datos en cada apertura de la aplicación.
+        // Esto evita duplicar datos en cada apertura de la aplicación.
         private async Task SembrarDatosIniciales()
         {
             try

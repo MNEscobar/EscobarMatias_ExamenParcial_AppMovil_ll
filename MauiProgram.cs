@@ -12,6 +12,9 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll
         // Termina en "/" para que las rutas relativas del servicio ("users") se combinen bien.
         private const string UrlBaseApi = "https://jsonplaceholder.typicode.com/";
 
+        // Nombre del archivo SQLite (se mantiene igual para no perder los datos ya guardados).
+        private const string NombreArchivoBaseDeDatos = "agenda_contactos.db3";
+
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -30,20 +33,26 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll
             // ===================================================================
             // Inyección de dependencias: todo el "cableado" de la app vive acá,
             // Nada se instancia con "new" en Views ni en ViewModels; todo llega por constructor.
+            // Los ViewModels piden interfaces (IContactoRepository, INavigationService, ...);
+            // acá se decide qué implementación concreta recibe cada una.
             // ===================================================================
 
             // --- Persistencia local (SQLite) ---
-            // ContactoRepository como Singleton: mantiene UNA sola conexión
-            // SQLiteAsyncConnection durante toda la vida de la app, en vez de
-            // abrir y cerrar el archivo .db3 constantemente.
-            builder.Services.AddSingleton<ContactoRepository>();
+            // Singleton: mantiene UNA sola conexión SQLiteAsyncConnection durante toda la vida de
+            // la app. La ruta del archivo (que depende de la plataforma) se calcula acá, y no dentro
+            // del repositorio, para que éste no dependa de MAUI. Se resuelve de forma perezosa:
+            // FileSystem.AppDataDirectory se consulta la primera vez que alguien pide el repositorio.
+            builder.Services.AddSingleton<IContactoRepository>(_ =>
+                new ContactoRepository(Path.Combine(FileSystem.AppDataDirectory, NombreArchivoBaseDeDatos)));
 
-            // --- Servicios ---
-            // Diálogos: Singleton porque no guarda estado.
+            // --- Servicios de plataforma (Singleton: no guardan estado) ---
             builder.Services.AddSingleton<IDialogService, DialogService>();
+            builder.Services.AddSingleton<INavigationService, NavigationService>();
+            builder.Services.AddSingleton<IConectividadService, ConectividadService>();
 
-            // API: AddHttpClient administra el ciclo de vida de HttpClient (evita agotar sockets)
-            // y se lo inyecta ya configurado a UsuarioApiService.
+            // --- API ---
+            // AddHttpClient administra el ciclo de vida de HttpClient (evita agotar sockets)
+            // y se lo inyecta ya configurado a UsuarioApiService (junto con IConectividadService).
             builder.Services.AddHttpClient<IUsuarioApiService, UsuarioApiService>(cliente =>
             {
                 cliente.BaseAddress = new Uri(UrlBaseApi);

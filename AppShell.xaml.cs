@@ -1,4 +1,5 @@
-﻿using EscobarMatias_ActividadPractica_AppMovil_ll.Views;
+﻿using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
+using EscobarMatias_ActividadPractica_AppMovil_ll.Views;
 
 namespace EscobarMatias_ActividadPractica_AppMovil_ll
 {
@@ -9,8 +10,9 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll
             InitializeComponent();
 
             // Rutas de las pantallas que no están en el TabBar y se abren con GoToAsync.
-            Routing.RegisterRoute(nameof(ContactoModalPage), typeof(ContactoModalPage));
-            Routing.RegisterRoute(nameof(UsuarioApiDetallePage), typeof(UsuarioApiDetallePage));
+            // Los nombres salen de RutasNavegacion, la misma clase que usan los ViewModels.
+            Routing.RegisterRoute(RutasNavegacion.ContactoModal, typeof(ContactoModalPage));
+            Routing.RegisterRoute(RutasNavegacion.UsuarioApiDetalle, typeof(UsuarioApiDetallePage));
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api;
-using Microsoft.Maui.Networking;
 
 namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
 {
@@ -19,17 +18,21 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
         private const string RutaUsuarios = "users";
 
         private readonly HttpClient _httpClient;
+        private readonly IConectividadService _conectividad;
 
-        public UsuarioApiService(HttpClient httpClient)
+        // Las dos dependencias llegan por constructor: el HttpClient (configurado en MauiProgram.cs)
+        // y el servicio de conectividad (así esta clase no depende de MAUI y se puede probar).
+        public UsuarioApiService(HttpClient httpClient, IConectividadService conectividad)
         {
             _httpClient = httpClient;
+            _conectividad = conectividad;
         }
 
         public async Task<ApiResult<List<UsuarioApi>>> ObtenerUsuariosAsync(CancellationToken cancellationToken = default)
         {
             // Chequeo rápido: si el dispositivo directamente no tiene internet,
             // no tiene sentido esperar a que la petición falle.
-            if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
+            if (!_conectividad.HayInternet)
                 return ApiResult<List<UsuarioApi>>.Falla(TipoErrorApi.SinConexion);
 
             try

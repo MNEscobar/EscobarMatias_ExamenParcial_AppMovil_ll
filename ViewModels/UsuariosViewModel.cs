@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Views;
 
 namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
 {
@@ -16,6 +15,7 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
     {
         private readonly IUsuarioApiService _usuarioApiService;
         private readonly IDialogService _dialogService;
+        private readonly INavigationService _navigationService;
 
         public ObservableCollection<UsuarioApi> Usuarios { get; } = new();
 
@@ -33,10 +33,14 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
         [ObservableProperty]
         private bool hayError;
 
-        public UsuariosViewModel(IUsuarioApiService usuarioApiService, IDialogService dialogService)
+        public UsuariosViewModel(
+            IUsuarioApiService usuarioApiService,
+            IDialogService dialogService,
+            INavigationService navigationService)
         {
             _usuarioApiService = usuarioApiService;
             _dialogService = dialogService;
+            _navigationService = navigationService;
         }
 
         [RelayCommand(CanExecute = nameof(PuedeCargar))]
@@ -91,10 +95,10 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
             {
                 var parametrosNavegacion = new Dictionary<string, object>
                 {
-                    { "Usuario", usuario }
+                    { RutasNavegacion.ParametroUsuario, usuario }
                 };
 
-                await Shell.Current.GoToAsync(nameof(UsuarioApiDetallePage), parametrosNavegacion);
+                await _navigationService.NavegarAAsync(RutasNavegacion.UsuarioApiDetalle, parametrosNavegacion);
             }
             catch (Exception ex)
             {

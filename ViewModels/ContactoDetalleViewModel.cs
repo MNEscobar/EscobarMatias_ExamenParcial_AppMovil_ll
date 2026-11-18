@@ -9,14 +9,16 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
 {
     // ========================================================================================
     // ViewModel de la pantalla modal de Alta/Edición de contacto.
-    // Implementa IQueryAttributable para recibir el Contacto que envía ContactosViewModel.
+    // Implementa IRecibeParametros para recibir el Contacto que envía ContactosViewModel
+    // (la página lo conecta con Shell mediante IQueryAttributable y le reenvía los parámetros).
     // Esto reemplaza la necesidad de acceder a la base de datos desde acá constantemente.
     // ========================================================================================
 
-    public partial class ContactoDetalleViewModel : ObservableObject, IQueryAttributable
+    public partial class ContactoDetalleViewModel : ObservableObject, IRecibeParametros
     {
-        private readonly ContactoRepository _contactoRepository;
+        private readonly IContactoRepository _contactoRepository;
         private readonly IDialogService _dialogService;
+        private readonly INavigationService _navigationService;
         private int _idContacto;
 
         [ObservableProperty]
@@ -40,19 +42,21 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
         [ObservableProperty]
         private string tituloPagina = "Nuevo contacto";
 
-        public ContactoDetalleViewModel(ContactoRepository contactoRepository, IDialogService dialogService)
+        public ContactoDetalleViewModel(
+            IContactoRepository contactoRepository,
+            IDialogService dialogService,
+            INavigationService navigationService)
         {
             _contactoRepository = contactoRepository;
             _dialogService = dialogService;
+            _navigationService = navigationService;
         }
 
-        // Se llama a este método automáticamente apenas se navega a esta página
-        // pasándole el diccionario de parámetros de la navegación.
+        // Se llama a este método apenas se navega a esta pantalla, con el diccionario de parámetros.
         // Acá se "desempaqueta" el Contacto recibido y se cargan los campos editables del formulario.
-
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public void RecibirParametros(IDictionary<string, object> parametros)
         {
-            if (query.TryGetValue("Contacto", out var valor) && valor is Contacto contactoRecibido)
+            if (parametros.TryGetValue(RutasNavegacion.ParametroContacto, out var valor) && valor is Contacto contactoRecibido)
             {
                 _idContacto = contactoRecibido.Id;
                 Nombre = contactoRecibido.Nombre;
@@ -104,26 +108,19 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
             await CerrarModalAsync();
         }
 
-        private static Task CerrarModalAsync() => Shell.Current.GoToAsync("..");
+        private Task CerrarModalAsync() => _navigationService.VolverAsync();
 
-        // Ejecuta las validaciones de ValidacionHelper
+        // Delega las reglas en ValidacionHelper (única fuente de las validaciones y de sus mensajes)
+        // y copia el resultado a las propiedades que la pantalla muestra en rojo.
         private bool ValidarCampos()
         {
-            ErrorNombre = ValidacionHelper.EsNombreValido(Nombre)
-                ? string.Empty
-                : "El nombre es obligatorio.";
+            var resultado = ValidacionHelper.ValidarContacto(Nombre, Telefono, Email);
 
-            ErrorTelefono = ValidacionHelper.EsTelefonoValido(Telefono)
-                ? string.Empty
-                : "El teléfono es obligatorio.";
+            ErrorNombre = resultado.ErrorNombre;
+            ErrorTelefono = resultado.ErrorTelefono;
+            ErrorEmail = resultado.ErrorEmail;
 
-            ErrorEmail = ValidacionHelper.EsEmailValido(Email)
-                ? string.Empty
-                : "El email no tiene un formato válido.";
-
-            return string.IsNullOrEmpty(ErrorNombre)
-                && string.IsNullOrEmpty(ErrorTelefono)
-                && string.IsNullOrEmpty(ErrorEmail);
+            return resultado.EsValido;
         }
     }
 }

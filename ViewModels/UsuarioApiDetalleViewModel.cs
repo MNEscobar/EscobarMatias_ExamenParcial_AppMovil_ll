@@ -1,22 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api;
+using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
 
 namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
 {
     // ========================================================================================
     // ViewModel de la pantalla de detalle de un usuario de la API.
-    // Implementa IQueryAttributable para recibir el UsuarioApi que envía UsuariosViewModel
+    // Implementa IRecibeParametros para recibir el UsuarioApi que envía UsuariosViewModel
     // (mismo mecanismo que ya usa ContactoDetalleViewModel).
     // ========================================================================================
-    public partial class UsuarioApiDetalleViewModel : ObservableObject, IQueryAttributable
+    public partial class UsuarioApiDetalleViewModel : ObservableObject, IRecibeParametros
     {
         [ObservableProperty]
         private UsuarioApi? usuario;
 
-        // Shell llama a este método al navegar, pasando el diccionario de parámetros.
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        // La página llama a este método al navegar, pasando el diccionario de parámetros.
+        public void RecibirParametros(IDictionary<string, object> parametros)
         {
-            if (query.TryGetValue("Usuario", out var valor) && valor is UsuarioApi usuarioRecibido)
+            if (parametros.TryGetValue(RutasNavegacion.ParametroUsuario, out var valor) && valor is UsuarioApi usuarioRecibido)
                 Usuario = usuarioRecibido;
         }
     }
