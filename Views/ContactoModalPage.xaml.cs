@@ -1,6 +1,6 @@
-using EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Views
+namespace EscobarMatias_ExamenParcial_AppMovil_ll.Views
 {
     // Debe ser partial para coincidir con la declaración generada por XAML.
     // Implementa IQueryAttributable porque Shell entrega los parámetros de navegación a la página:
@@ -11,7 +11,7 @@ namespace EscobarMatias_ActividadPractica_AppMovil_ll.Views
         // contenedor de DI armado en MauiProgram.cs.
         public ContactoModalPage(ContactoDetalleViewModel viewModel)
         {
-            InitializeComponent();
+            this.InitializeComponent();
             BindingContext = viewModel;
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // Abstrae los cuadros de diálogo para que los ViewModels no dependan de Shell ni de ninguna
     // clase de la interfaz gráfica. Se registra en MauiProgram.cs y llega por constructor.

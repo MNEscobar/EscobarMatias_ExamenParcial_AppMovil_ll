@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Data;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
-using EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Views;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Data;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;
+using EscobarMatias_ExamenParcial_AppMovil_ll.Services;
+using EscobarMatias_ExamenParcial_AppMovil_ll.Views;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll
+namespace EscobarMatias_ExamenParcial_AppMovil_ll
 {
     public static class MauiProgram
     {

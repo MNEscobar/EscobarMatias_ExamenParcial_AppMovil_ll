@@ -8,7 +8,7 @@
 // y el acceso a la base de datos vive en Data/ContactoRepository.cs.
 // ==============================================================================================
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Models
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models
 {
     public class Contacto
     {

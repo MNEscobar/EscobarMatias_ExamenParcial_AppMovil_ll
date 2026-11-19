@@ -2,7 +2,7 @@ using System;
 using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll
+namespace EscobarMatias_ExamenParcial_AppMovil_ll
 {
     internal class Program : MauiApplication
     {

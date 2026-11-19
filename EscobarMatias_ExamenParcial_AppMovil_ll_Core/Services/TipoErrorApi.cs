@@ -1,4 +1,4 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+﻿namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // Clasifica los distintos problemas que pueden ocurrir al consumir la API.
     // El servicio solo "clasifica" el error; es el ViewModel quien decide qué mensaje mostrar.

@@ -1,7 +1,7 @@
-﻿using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Views;
+﻿using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services;
+using EscobarMatias_ExamenParcial_AppMovil_ll.Views;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll
+namespace EscobarMatias_ExamenParcial_AppMovil_ll
 {
     public partial class AppShell : Shell
     {

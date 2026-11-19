@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models.Api;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
 {
     // ========================================================================================
     // ViewModel de la pantalla de detalle de un usuario de la API.

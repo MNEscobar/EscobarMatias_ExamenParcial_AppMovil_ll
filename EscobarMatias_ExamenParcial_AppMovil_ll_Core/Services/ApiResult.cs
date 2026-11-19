@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // ==============================================================================================
     // Resultado de una llamada a la API: o trae los datos (Datos) o trae el tipo de error (Error).

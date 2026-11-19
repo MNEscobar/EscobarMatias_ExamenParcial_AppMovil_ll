@@ -1,4 +1,4 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+﻿namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // ==============================================================================================
     // Constantes de navegación: nombres de las rutas registradas en Shell y claves de los

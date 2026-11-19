@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll
+namespace EscobarMatias_ExamenParcial_AppMovil_ll
 {
     public class Program
     {

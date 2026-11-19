@@ -1,4 +1,4 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+﻿namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // Abstrae la consulta de conectividad (en MAUI, la clase estática Connectivity) para que el
     // servicio de API no dependa de la plataforma y se pueda probar simulando "con" o "sin" internet.

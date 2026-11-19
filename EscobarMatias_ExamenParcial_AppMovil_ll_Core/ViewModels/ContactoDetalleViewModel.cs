@@ -1,11 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Data;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Helpers;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Services;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Data;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Helpers;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
 {
     // ========================================================================================
     // ViewModel de la pantalla modal de Alta/Edición de contacto.

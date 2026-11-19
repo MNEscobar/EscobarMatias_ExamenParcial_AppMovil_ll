@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models.Api
 {
     // ==============================================================================================
     // DTO (Data Transfer Object) que representa un usuario tal como lo devuelve la API pública

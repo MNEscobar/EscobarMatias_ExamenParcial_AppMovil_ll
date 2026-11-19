@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!--
+		Capa Core: modelos, validaciones, repositorio (SQLite), servicios de API y ViewModels.
+		Es una librería net9.0 "plana": NO depende de .NET MAUI, por eso se puede
+		probar con xUnit sin emulador ni workload de MAUI (ver proyecto de tests).
+		La app MAUI la referencia y le aporta las implementaciones de plataforma
+		(navegación, diálogos, conectividad) mediante inyección de dependencias.
+	-->
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>EscobarMatias_ExamenParcial_AppMovil_ll_Core</RootNamespace>
+		<AssemblyName>EscobarMatias_ExamenParcial_AppMovil_ll_Core</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+		<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
+		<PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.11" />
+	</ItemGroup>
+
+</Project>

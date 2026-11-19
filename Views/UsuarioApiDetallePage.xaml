@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels"
-             x:Class="EscobarMatias_ActividadPractica_AppMovil_ll.Views.UsuarioApiDetallePage"
+             xmlns:vm="clr-namespace:EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;assembly=EscobarMatias_ExamenParcial_AppMovil_ll_Core"
+             x:Class="EscobarMatias_ExamenParcial_AppMovil_ll.Views.UsuarioApiDetallePage"
              x:DataType="vm:UsuarioApiDetalleViewModel"
              Title="Detalle de usuario">
 

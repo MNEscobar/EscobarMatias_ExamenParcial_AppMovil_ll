@@ -1,4 +1,7 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+﻿using Microsoft.Maui.Controls;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services;
+
+namespace EscobarMatias_ExamenParcial_AppMovil_ll.Services
 {
     // Implementación de INavigationService apoyada en Shell.
     public class NavigationService : INavigationService

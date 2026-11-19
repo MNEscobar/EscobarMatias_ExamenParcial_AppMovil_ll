@@ -1,6 +1,6 @@
-using EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Views;
+namespace EscobarMatias_ExamenParcial_AppMovil_ll.Views;
 
 // ============================================================================================
 // Code-behind de la pantalla principal.
@@ -12,15 +12,16 @@ public partial class ContactosPage : ContentPage
 {
     private readonly ContactosViewModel _viewModel;
     public ContactosPage(ContactosViewModel viewModel)
-     {
-        InitializeComponent();
+        : base()
+    {
+        InitializeComponent(); 
 
         _viewModel = viewModel;
         BindingContext = _viewModel;
     }
 
     protected override void OnAppearing()
-        {
+    {
         base.OnAppearing();
 
         if (_viewModel.CargarContactosCommand.CanExecute(null))

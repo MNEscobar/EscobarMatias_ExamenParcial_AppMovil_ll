@@ -1,6 +1,6 @@
-using EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Views;
+namespace EscobarMatias_ExamenParcial_AppMovil_ll.Views;
 
 // ============================================================================================
 // Code-behind de la pantalla "Usuarios API".

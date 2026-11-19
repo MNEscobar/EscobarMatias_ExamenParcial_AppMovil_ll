@@ -1,4 +1,4 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels
+﻿namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
 {
     // ==============================================================================================
     // Contrato para los ViewModels que reciben datos al navegar hacia su pantalla.

@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Helpers
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core  .Helpers
 {
     // ==============================================================================================
     // Validaciones de un contacto, centralizadas en un único lugar.

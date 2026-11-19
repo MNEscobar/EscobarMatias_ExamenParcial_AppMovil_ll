@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Data;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models;
 using SQLite;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Data
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Data
 {
     // ==============================================================================================
     // Única clase de todo el proyecto que conoce la existencia de SQLite.

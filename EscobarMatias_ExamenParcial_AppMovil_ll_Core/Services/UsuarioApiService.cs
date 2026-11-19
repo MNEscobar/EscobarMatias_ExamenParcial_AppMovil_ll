@@ -2,9 +2,9 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api;
+using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models.Api;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // ==============================================================================================
     // Única clase de la app que conoce HTTP y JSON.

@@ -1,6 +1,6 @@
-﻿using EscobarMatias_ActividadPractica_AppMovil_ll.Models;
+﻿using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll.Data
+namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Data
 {
     // ==============================================================================================
     // Contrato del repositorio de contactos. Los ViewModels dependen de esta interfaz (no de la

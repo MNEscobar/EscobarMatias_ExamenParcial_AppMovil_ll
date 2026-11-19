@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll
+namespace EscobarMatias_ExamenParcial_AppMovil_ll
 {
     [Application]
     public class MainApplication : MauiApplication

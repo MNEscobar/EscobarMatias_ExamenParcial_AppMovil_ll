@@ -1,4 +1,4 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+﻿namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services
 {
     // Abstrae la navegación para que los ViewModels no dependan de Shell (una clase de la interfaz
     // gráfica). Se registra en MauiProgram.cs y llega por constructor, igual que IDialogService.

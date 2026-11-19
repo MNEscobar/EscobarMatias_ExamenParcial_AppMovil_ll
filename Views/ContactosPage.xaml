@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels"
-             xmlns:models="clr-namespace:EscobarMatias_ActividadPractica_AppMovil_ll.Models"
-             x:Class="EscobarMatias_ActividadPractica_AppMovil_ll.Views.ContactosPage"
-             x:DataType="vm:ContactosViewModel"
+             xmlns:vm="clr-namespace:EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;assembly=EscobarMatias_ExamenParcial_AppMovil_ll_Core"
+             xmlns:models="clr-namespace:EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models;assembly=EscobarMatias_ExamenParcial_AppMovil_ll_Core"
+             x:Class="EscobarMatias_ExamenParcial_AppMovil_ll.Views.ContactosPage"
              x:Name="PaginaContactos"
-             Title="Agenda de Contactos">
+             Title="Agenda de Contactos"
+             x:DataType="vm:ContactosViewModel">
 
     <Grid RowDefinitions="Auto,Auto,*"
-
           Padding="16"
           RowSpacing="12">
 
         <!-- SearchBar: al presionar la lupa/Enter dispara BuscarCommand -->
         <SearchBar Grid.Row="0"
-
                    Placeholder="Buscar por nombre..."
-
                    Text="{Binding TextoBusqueda}"
-
                    SearchCommand="{Binding BuscarCommand}" />
 
         <!-- Abre el modal en modo "Agregar" -->
@@ -44,11 +39,9 @@
 
                 <CollectionView.EmptyView>
                     <Label Text="No hay contactos para mostrar."
-
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
                            TextColor="{StaticResource ColorTextoSecundario}" />
-
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>

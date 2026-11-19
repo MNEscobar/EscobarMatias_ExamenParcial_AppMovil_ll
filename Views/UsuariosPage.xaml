@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:EscobarMatias_ActividadPractica_AppMovil_ll.ViewModels"
-             xmlns:api="clr-namespace:EscobarMatias_ActividadPractica_AppMovil_ll.Models.Api"
-             x:Class="EscobarMatias_ActividadPractica_AppMovil_ll.Views.UsuariosPage"
+             xmlns:vm="clr-namespace:EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels;assembly=EscobarMatias_ExamenParcial_AppMovil_ll_Core"
+             xmlns:api="clr-namespace:EscobarMatias_ExamenParcial_AppMovil_ll_Core.Models.Api;assembly=EscobarMatias_ExamenParcial_AppMovil_ll_Core"
+             x:Class="EscobarMatias_ExamenParcial_AppMovil_ll.Views.UsuariosPage"
              x:DataType="vm:UsuariosViewModel"
              Title="Usuarios API">
 

@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace EscobarMatias_ActividadPractica_AppMovil_ll
+namespace EscobarMatias_ExamenParcial_AppMovil_ll
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

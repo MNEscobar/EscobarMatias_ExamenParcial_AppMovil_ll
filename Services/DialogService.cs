@@ -1,4 +1,6 @@
-﻿namespace EscobarMatias_ActividadPractica_AppMovil_ll.Services
+﻿using EscobarMatias_ExamenParcial_AppMovil_ll_Core.Services;
+
+namespace EscobarMatias_ExamenParcial_AppMovil_ll.Services
 {
     // Implementación de IDialogService apoyada en la página actual de Shell.
     public class DialogService : IDialogService
