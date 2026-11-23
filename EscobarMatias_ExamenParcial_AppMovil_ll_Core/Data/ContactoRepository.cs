@@ -112,10 +112,12 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.Data
                 if (string.IsNullOrWhiteSpace(textoBusqueda))
                     return await ObtenerTodosAsync();
 
-                string texto = textoBusqueda.Trim();
+                // sqlite-net traduce Contains() a instr(), que distingue mayúsculas de minúsculas.
+                // Se pasa todo a minúsculas (lower() en SQL) para que "ana" encuentre a "Ana García".
+                string texto = textoBusqueda.Trim().ToLowerInvariant();
 
                 return await _conexion!.Table<Contacto>()
-                                        .Where(c => c.Nombre.Contains(texto))
+                                        .Where(c => c.Nombre.ToLower().Contains(texto))
                                         .OrderBy(c => c.Nombre)
                                         .ToListAsync();
             }
