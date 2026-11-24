@@ -1,0 +1,199 @@
+# =====================================================================================
+# CI — Integración continua del proyecto EscobarMatias_ExamenParcial_AppMovil_ll
+#
+# Qué hace este pipeline:
+#   Job 1 "pruebas"       -> restaura, compila y prueba Core + Tests en una MATRIZ
+#                            (2 sistemas operativos x 2 configuraciones = 4 ejecuciones en paralelo)
+#                            y sube como artefactos los resultados .trx y la cobertura.
+#   Job 2 "publicar-core" -> solo si todas las pruebas pasaron, publica los binarios de Core
+#                            y los sube como artefacto.
+#
+# IMPORTANTE: el pipeline NUNCA compila el .csproj raíz (la app MAUI) ni la .sln completa,
+# porque eso exige instalar los workloads de MAUI (Android/iOS/Windows). Todo apunta
+# directamente a los proyectos Core y Tests, que son net9.0 "planos" y solo necesitan el SDK de .NET.
+# =====================================================================================
+name: CI
+
+# ---------------------------------- Cuándo se ejecuta ----------------------------------
+on:
+  push:
+    branches: [main]          # cada push a main
+  pull_request:
+    branches: [main]          # cada Pull Request que apunte a main
+  workflow_dispatch:          # botón "Run workflow" para lanzarlo a mano desde GitHub
+
+# Permisos mínimos para el token del workflow (buena práctica de seguridad):
+# solo necesita leer el código.
+permissions:
+  contents: read
+
+# Si llegan dos pushes seguidos a la misma rama, se cancela la ejecución vieja y queda la nueva.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Variables compartidas por todos los jobs.
+# Las rutas usan "/" porque funcionan igual en Linux y en Windows.
+env:
+  DOTNET_VERSION: 9.0.x
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  CORE_PROJECT: EscobarMatias_ExamenParcial_AppMovil_ll_Core/EscobarMatias_ExamenParcial_AppMovil_ll_Core.csproj
+  TESTS_PROJECT: EscobarMatias_ExamenParcial_AppMovil_ll_Tests/EscobarMatias_ExamenParcial_AppMovil_ll_Tests.csproj
+
+# Todos los pasos "run" usan bash (también en Windows, donde viene Git Bash),
+# así los mismos comandos sirven en las dos plataformas.
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # ======================================================================================
+  # JOB 1: restaurar -> compilar -> probar (en matriz)
+  # ======================================================================================
+  pruebas:
+    name: Pruebas (${{ matrix.os }} · ${{ matrix.configuration }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false        # que una combinación roja no cancele a las demás: se ven todos los resultados
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        configuration: [Debug, Release]
+
+    steps:
+      # ---- 1) Preparación ----
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Instalar el SDK de .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # ---- 2) Caché de NuGet ----
+      # Guarda los paquetes descargados (~/.nuget/packages) entre ejecuciones.
+      # La clave incluye el sistema operativo, la configuración y un hash de los .csproj:
+      # si cambia una dependencia, el hash cambia y se arma una caché nueva;
+      # si no cambia nada, el restore tarda segundos en vez de volver a bajar todo.
+      - name: Cachear paquetes NuGet
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ matrix.configuration }}-${{ hashFiles('EscobarMatias_ExamenParcial_AppMovil_ll_Core/*.csproj', 'EscobarMatias_ExamenParcial_AppMovil_ll_Tests/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-${{ matrix.configuration }}-
+
+      # ---- 3) Restore ----
+      - name: Restaurar dependencias (Core)
+        run: dotnet restore "$CORE_PROJECT"
+
+      - name: Restaurar dependencias (Tests)
+        run: dotnet restore "$TESTS_PROJECT"
+
+      # ---- 4) Build (--no-restore: ya se restauró en los pasos anteriores) ----
+      - name: Compilar Core (${{ matrix.configuration }})
+        run: dotnet build "$CORE_PROJECT" --configuration ${{ matrix.configuration }} --no-restore
+
+      - name: Compilar Tests (${{ matrix.configuration }})
+        run: dotnet build "$TESTS_PROJECT" --configuration ${{ matrix.configuration }} --no-restore
+
+      # ---- 5) Test (--no-build: ya se compiló) ----
+      #  --logger trx            -> genera TestResults/resultados.trx (resultado detallado de cada prueba)
+      #  --logger console        -> muestra el resumen en el log de GitHub
+      #  --collect XPlat Code Coverage -> mide la cobertura con coverlet.collector (ya instalado en Tests)
+      - name: Ejecutar pruebas
+        run: >
+          dotnet test "$TESTS_PROJECT"
+          --configuration ${{ matrix.configuration }}
+          --no-build
+          --logger "trx;LogFileName=resultados.trx"
+          --logger "console;verbosity=normal"
+          --collect:"XPlat Code Coverage"
+          --results-directory ./TestResults
+
+      # ---- 6) Reporte de cobertura legible (HTML + resumen en la pestaña "Summary" del run) ----
+      # Solo en Linux, para no repetir el mismo reporte en cada combinación.
+      - name: Instalar ReportGenerator
+        if: runner.os == 'Linux' && !cancelled()
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generar reporte de cobertura
+        if: runner.os == 'Linux' && !cancelled()
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          reportgenerator "-reports:TestResults/**/coverage.cobertura.xml" "-targetdir:CoverageReport" "-reporttypes:Html;MarkdownSummaryGithub"
+          cat CoverageReport/*.md >> "$GITHUB_STEP_SUMMARY"
+
+      # ---- 7) Artefactos ----
+      # "!cancelled()" hace que se suban aunque alguna prueba haya fallado (justo cuando más sirven).
+      # Con upload-artifact v4 o superior cada artefacto necesita un nombre ÚNICO por ejecución,
+      # por eso el nombre incluye el sistema operativo y la configuración de la matriz.
+      - name: Subir resultados de pruebas (.trx)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: resultados-pruebas-${{ matrix.os }}-${{ matrix.configuration }}
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Subir cobertura (Cobertura XML)
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: cobertura-xml-${{ matrix.os }}-${{ matrix.configuration }}
+          path: TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Subir reporte de cobertura (HTML)
+        if: runner.os == 'Linux' && !cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: cobertura-html-${{ matrix.os }}-${{ matrix.configuration }}
+          path: CoverageReport
+          if-no-files-found: warn
+          retention-days: 14
+
+  # ======================================================================================
+  # JOB 2: publicar los binarios de Core (solo si TODAS las pruebas pasaron)
+  # ======================================================================================
+  publicar-core:
+    name: Publicar binarios de Core
+    needs: pruebas
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v7
+
+      - name: Instalar el SDK de .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cachear paquetes NuGet
+        uses: actions/cache@v6
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-publicar-${{ hashFiles('EscobarMatias_ExamenParcial_AppMovil_ll_Core/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-publicar-
+
+      - name: Restaurar dependencias (Core)
+        run: dotnet restore "$CORE_PROJECT"
+
+      # "publish" compila en Release y deja la librería lista (Core.dll + sus dependencias) en una carpeta.
+      - name: Publicar Core (Release)
+        run: dotnet publish "$CORE_PROJECT" --configuration Release --no-restore --output ./publicado/core
+
+      - name: Subir binarios publicados de Core
+        uses: actions/upload-artifact@v7
+        with:
+          name: core-net9.0-publicado
+          path: publicado/core
+          if-no-files-found: error
+          retention-days: 14
