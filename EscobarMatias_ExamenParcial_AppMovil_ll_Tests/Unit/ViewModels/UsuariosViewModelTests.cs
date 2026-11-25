@@ -2,15 +2,16 @@ using NSubstitute.ExceptionExtensions;
 
 namespace EscobarMatias_ExamenParcial_AppMovil_ll_Tests.Unit.ViewModels;
 
-// El ViewModel recibe IUsuarioApiService, IDialogService e INavigationService; los tres son mocks.
+// El ViewModel recibe IUsuarioApiService, IDialogService, INavigationService e IVibracionService; los cuatro son mocks.
 // (IConectividadService no aparece acá: lo usa el servicio de API, que se prueba en UsuarioApiServiceTests.)
 public class UsuariosViewModelTests
 {
     private readonly IUsuarioApiService _api = Substitute.For<IUsuarioApiService>();
     private readonly IDialogService _dialogos = Substitute.For<IDialogService>();
     private readonly INavigationService _navegacion = Substitute.For<INavigationService>();
+    private readonly IVibracionService _vibracion = Substitute.For<IVibracionService>();
 
-    private UsuariosViewModel CrearViewModel() => new(_api, _dialogos, _navegacion);
+    private UsuariosViewModel CrearViewModel() => new(_api, _dialogos, _navegacion, _vibracion);
 
     private static List<UsuarioApi> Usuarios(int cantidad) =>
         Enumerable.Range(1, cantidad).Select(i => new UsuarioApi { Id = i, Nombre = $"Usuario {i}" }).ToList();
@@ -201,5 +202,112 @@ public class UsuariosViewModelTests
 
         // Assert
         await _dialogos.Received(1).MostrarAlertaAsync(Arg.Is("Error"), Arg.Any<string>(), Arg.Any<string>());
+    }
+
+    // ----------------------------- Vibración ante errores -----------------------------
+    [Theory]
+    [InlineData(TipoErrorApi.SinConexion)]
+    [InlineData(TipoErrorApi.TiempoAgotado)]
+    [InlineData(TipoErrorApi.SolicitudInvalida)]
+    [InlineData(TipoErrorApi.ErrorServidor)]
+    [InlineData(TipoErrorApi.RespuestaInvalida)]
+    [InlineData(TipoErrorApi.Desconocido)]
+    public async Task CargarUsuarios_ConErrorDeApi_VibraUnaVezConLaDuracionCorta(TipoErrorApi error)
+    {
+        // Arrange
+        ApiDevuelve(ApiResult<List<UsuarioApi>>.Falla(error, 500));
+        var vm = CrearViewModel();
+
+        // Act
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+
+        // Assert
+        _vibracion.Received(1).Vibrar(UsuariosViewModel.DuracionVibracionError);
+    }
+
+    [Fact]
+    public async Task CargarUsuarios_ConExcepcionInesperada_Vibra()
+    {
+        // Arrange
+        _api.ObtenerUsuariosAsync(Arg.Any<CancellationToken>()).ThrowsAsync(new InvalidOperationException("falla de prueba"));
+        var vm = CrearViewModel();
+
+        // Act
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+
+        // Assert
+        _vibracion.Received(1).Vibrar(UsuariosViewModel.DuracionVibracionError);
+    }
+
+    [Fact]
+    public async Task CargarUsuarios_Exito_NoVibra()
+    {
+        // Arrange
+        ApiDevuelve(ApiResult<List<UsuarioApi>>.Ok(Usuarios(3), 200));
+        var vm = CrearViewModel();
+
+        // Act
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+
+        // Assert
+        _vibracion.DidNotReceive().Vibrar(Arg.Any<TimeSpan>());
+    }
+
+    [Fact]
+    public async Task CargarUsuarios_ConDosErroresSeguidos_VibraEnCadaUno()
+    {
+        // Arrange
+        ApiDevuelve(ApiResult<List<UsuarioApi>>.Falla(TipoErrorApi.SinConexion));
+        var vm = CrearViewModel();
+
+        // Act
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+
+        // Assert
+        _vibracion.Received(2).Vibrar(UsuariosViewModel.DuracionVibracionError);
+    }
+
+    [Fact]
+    public async Task CargarUsuarios_ConErrorSeguidoDeExito_SoloVibraEnElError()
+    {
+        // Arrange: primero falla...
+        ApiDevuelve(ApiResult<List<UsuarioApi>>.Falla(TipoErrorApi.ErrorServidor, 500));
+        var vm = CrearViewModel();
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+        // ...y después la API responde bien.
+        ApiDevuelve(ApiResult<List<UsuarioApi>>.Ok(Usuarios(2), 200));
+
+        // Act
+        await vm.CargarUsuariosCommand.ExecuteAsync(null);
+
+        // Assert
+        _vibracion.Received(1).Vibrar(Arg.Any<TimeSpan>());
+        Assert.False(vm.HayError);
+    }
+
+    [Fact]
+    public void DuracionVibracionError_EsUnaVibracionCorta()
+    {
+        // Arrange + Act
+        double milisegundos = UsuariosViewModel.DuracionVibracionError.TotalMilliseconds;
+
+        // Assert: más que cero y como máximo medio segundo.
+        Assert.InRange(milisegundos, 1, 500);
+    }
+
+    [Fact]
+    public async Task VerDetalle_SiLaNavegacionFalla_NoVibra()
+    {
+        // Arrange: la vibración es solo para errores de la API, no para otros problemas.
+        _navegacion.NavegarAAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>?>())
+                   .ThrowsAsync(new InvalidOperationException("falla de prueba"));
+        var vm = CrearViewModel();
+
+        // Act
+        await vm.VerDetalleCommand.ExecuteAsync(new UsuarioApi { Id = 1 });
+
+        // Assert
+        _vibracion.DidNotReceive().Vibrar(Arg.Any<TimeSpan>());
     }
 }

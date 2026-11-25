@@ -9,6 +9,7 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
     // =============================================================================
     // ViewModel de la pantalla "Usuarios API".
     // Carga la lista desde la API, informa el estado en un mensaje y navega al detalle.
+    // Ante un error de API, además del mensaje, hace vibrar el dispositivo (IVibracionService).
     // No conoce HttpClient ni JSON: todo eso lo resuelve IUsuarioApiService.
     // =============================================================================
     public partial class UsuariosViewModel : ObservableObject
@@ -16,6 +17,10 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
         private readonly IUsuarioApiService _usuarioApiService;
         private readonly IDialogService _dialogService;
         private readonly INavigationService _navigationService;
+        private readonly IVibracionService _vibracionService;
+
+        // Vibración "corta" que avisa del error (en iOS el sistema ignora la duración y usa un valor fijo).
+        public static readonly TimeSpan DuracionVibracionError = TimeSpan.FromMilliseconds(200);
 
         public ObservableCollection<UsuarioApi> Usuarios { get; } = new();
 
@@ -36,11 +41,13 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
         public UsuariosViewModel(
             IUsuarioApiService usuarioApiService,
             IDialogService dialogService,
-            INavigationService navigationService)
+            INavigationService navigationService,
+            IVibracionService vibracionService)
         {
             _usuarioApiService = usuarioApiService;
             _dialogService = dialogService;
             _navigationService = navigationService;
+            _vibracionService = vibracionService;
         }
 
         [RelayCommand(CanExecute = nameof(PuedeCargar))]
@@ -64,8 +71,7 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
                 }
                 else
                 {
-                    HayError = true;
-                    MensajeEstado = ObtenerMensajeDeError(resultado.Error, resultado.CodigoHttp);
+                    NotificarError(ObtenerMensajeDeError(resultado.Error, resultado.CodigoHttp));
                 }
             }
             catch (Exception ex)
@@ -73,8 +79,7 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
                 // Red de seguridad: el servicio ya captura sus errores, pero esto evita
                 // que una excepción no prevista cierre la aplicación.
                 System.Diagnostics.Debug.WriteLine($"[UsuariosViewModel] {ex}");
-                HayError = true;
-                MensajeEstado = "Ocurrió un error inesperado al cargar los usuarios.";
+                NotificarError("Ocurrió un error inesperado al cargar los usuarios.");
             }
             finally
             {
@@ -83,6 +88,15 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll_Core.ViewModels
         }
 
         private bool PuedeCargar() => !EstaCargando;
+
+        // Marca el error, muestra el mensaje y hace vibrar el dispositivo una vez.
+        // IVibracionService nunca lanza excepciones (ver su contrato), así que no hace falta un try/catch acá.
+        private void NotificarError(string mensaje)
+        {
+            HayError = true;
+            MensajeEstado = mensaje;
+            _vibracionService.Vibrar(DuracionVibracionError);
+        }
 
         // Navega a la pantalla de detalle enviando el usuario seleccionado como parámetro.
         [RelayCommand]

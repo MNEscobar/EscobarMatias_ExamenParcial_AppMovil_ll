@@ -50,6 +50,8 @@ namespace EscobarMatias_ExamenParcial_AppMovil_ll
             builder.Services.AddSingleton<IDialogService, DialogService>();
             builder.Services.AddSingleton<INavigationService, NavigationService>();
             builder.Services.AddSingleton<IConectividadService, ConectividadService>();
+            builder.Services.AddSingleton<IUbicacionService, UbicacionService>();   // GPS (Geolocation + permisos)
+            builder.Services.AddSingleton<IVibracionService, VibracionService>();   // Vibración
 
             // --- API ---
             // AddHttpClient administra el ciclo de vida de HttpClient (evita agotar sockets)

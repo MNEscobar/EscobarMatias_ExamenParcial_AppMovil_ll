@@ -35,6 +35,33 @@
             <Label Text="Calle" FontAttributes="Bold" Margin="0,12,0,0" />
             <Label Text="{Binding Usuario.Direccion.Calle}" />
 
+            <!-- GPS: INICIO -->
+            <!-- Calcula la distancia entre la ubicación del dispositivo (GPS) y las coordenadas de este usuario.
+                 El ViewModel pide el permiso y la ubicación a través de IUbicacionService. -->
+            <Label Text="Coordenadas" FontAttributes="Bold" Margin="0,12,0,0" />
+            <Label Text="{Binding Usuario.Direccion.Geo.Latitud, StringFormat='Latitud: {0}'}" />
+            <Label Text="{Binding Usuario.Direccion.Geo.Longitud, StringFormat='Longitud: {0}'}" />
+
+            <Button Text="Calcular distancia desde mi ubicación"
+                    Margin="0,20,0,0"
+                    Command="{Binding CalcularDistanciaCommand}" />
+
+            <ActivityIndicator IsRunning="{Binding EstaBuscandoUbicacion}"
+                               IsVisible="{Binding EstaBuscandoUbicacion}" />
+
+            <!-- Resultado o error: gris por defecto; el DataTrigger lo pinta de rojo si hubo un error. -->
+            <Label Text="{Binding MensajeDistancia}"
+                   IsVisible="{Binding HayMensajeDistancia}"
+                   TextColor="{StaticResource ColorTextoSecundario}"
+                   Margin="0,8,0,0">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding HayErrorDistancia}" Value="True">
+                        <Setter Property="TextColor" Value="{StaticResource ColorError}" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
+            <!-- GPS: FIN -->
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
